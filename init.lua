@@ -92,48 +92,6 @@ require('lazy').setup({
         end,
     },
     
-    -- Debugging configurations
-    {
-        "rcarriga/nvim-dap-ui",
-        dependencies = "mfussenegger/nvim-dap",
-        config = function()
-            local dap = require("dap")
-            local dapui = require("dapui")
-            dapui.setup()
-            dap.listeners.after.event_initialized["dapui_config"] = function()
-                dapui.open()
-            end
-            dap.listeners.before.event_terminated["dapui_config"] = function()
-                dapui.close()
-            end
-            dap.listeners.before.event_exited["dapui_config"] = function()
-                dapui.close()
-            end
-        end,
-    },
-    
-    {
-        "mfussenegger/nvim-dap",
-        config = function(_, opts)
-            require("core.utils").load_mappings("dap")
-        end,
-    },
-    
-    {
-        "mfussenegger/nvim-dap-python",
-        ft = "python",
-        dependencies = {
-            "mfussenegger/nvim-dap",
-            "rcarriga/nvim-dap-ui",
-            "nvim-neotest/nvim-nio",
-        },
-        config = function(_, opts)
-            local path = "~/.local/share/nvim/mason/packages/debugpy/venv/bin/python"
-            require("dap-python").setup(path)
-            require("core.utils").load_mappings("dap_python")
-        end,
-    },
-    
     'tweekmonster/django-plus.vim',
     'numToStr/Comment.nvim',
 
@@ -215,11 +173,184 @@ require('lazy').setup({
             vim.keymap.set('n', '<leader>fs', builtin.spell_suggest, { desc = '[F]ind [S]pelling Suggestion' })
         end,
     },
+    {
+    'neovim/nvim-lspconfig',
+    dependencies = {
+      'williamboman/mason.nvim',
+      'williamboman/mason-lspconfig.nvim',
+      'WhoIsSethDaniel/mason-tool-installer.nvim',
+      'j-hui/fidget.nvim',
+      'folke/neodev.nvim',
+    },
+    config = function()
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
+        callback = function(event)
+          local map = function(keys, func, desc)
+    vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+end
+-- Add descriptions to each mapping
+map('gd', require('telescope.builtin').lsp_definitions, "Go to definition")
+map('gr', require('telescope.builtin').lsp_references, "Go to references")
+map('gI', require('telescope.builtin').lsp_implementations, "Go to implementation")
+map('<leader>D', require('telescope.builtin').lsp_type_definitions, "Go to type definitions")
+map('<leader>ds', require('telescope.builtin').lsp_document_symbols, "Document symbols")
+map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, "Workspace symbols")
+map('<leader>rn', vim.lsp.buf.rename, "Rename")
+map('<leader>ca', vim.lsp.buf.code_action, "Code action")
+map('K', vim.lsp.buf.hover, "Hover")
+map('gD', vim.lsp.buf.declaration, "Go to declaration")
+
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client and client.server_capabilities.documentHighlightProvider then
+            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+              buffer = event.buf,
+              callback = vim.lsp.buf.document_highlight,
+            })
+            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+              buffer = event.buf,
+              callback = vim.lsp.buf.clear_references,
+            })
+          end
+          if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+            map('<leader>th', function()
+              vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled())
+            end)
+          end
+        end,
+      })
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      local servers = {
+        pyright = {},
+        black = {},
+        debugpy = {},
+        ruff = {},
+        lua_ls = {
+          settings = {
+            Lua = {
+              completion = {
+                callSnippet = 'Replace',
+              },
+            },
+          },
+        },
+      }
+      require('mason').setup()
+      local ensure_installed = vim.tbl_keys(servers or {})
+      vim.list_extend(ensure_installed, {
+        'stylua',
+      })
+      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+      require('mason-lspconfig').setup {
+        handlers = {
+          function(server_name)
+            local server = servers[server_name] or {}
+            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            require('lspconfig')[server_name].setup(server)
+          end,
+        },
+      }
+    end,
+  },
+
+  {
+    'stevearc/conform.nvim',
+    lazy = false,
+    keys = {
+      {
+        '<leader>f',
+        function()
+          require('conform').format { async = true, lsp_fallback = true }
+        end,
+        mode = '',
+        desc = '[F]ormat buffer',
+      },
+    },
+    opts = {
+      notify_on_error = false,
+      format_on_save = function(bufnr)
+        local disable_filetypes = { c = true, cpp = true }
+        return {
+          timeout_ms = 500,
+          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+        }
+      end,
+      formatters_by_ft = {
+        lua = { 'stylua' },
+        python = { "isort", "black" },
+        javascript = { { "prettierd", "prettier" } },
+      },
+    },
+  },
+
+  {
+    'hrsh7th/nvim-cmp',
+    event = 'InsertEnter',
+    dependencies = {
+        {
+            'L3MON4D3/LuaSnip',
+            build = (function()
+                if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then
+                    return
+                end
+                return 'make install_jsregexp'
+            end)(),
+            dependencies = {
+            },
+        },
+        'saadparwaiz1/cmp_luasnip',
+        'hrsh7th/cmp-nvim-lsp',
+        'hrsh7th/cmp-path',
+    },
+    config = function()
+        local cmp = require 'cmp'
+        local luasnip = require 'luasnip'
+        luasnip.config.setup {}
+
+        cmp.setup {
+            snippet = {
+                expand = function(args)
+                    luasnip.lsp_expand(args.body)
+                end,
+            },
+            completion = { completeopt = 'menu,menuone,noinsert' },
+            mapping = cmp.mapping.preset.insert {
+                ['<C-n>'] = cmp.mapping.select_next_item(),
+                ['<C-p>'] = cmp.mapping.select_prev_item(),
+                ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+                ['<C-f>'] = cmp.mapping.scroll_docs(4),
+                ['<C-y>'] = cmp.mapping.confirm { select = true },
+                ['<C-Space>'] = cmp.mapping.complete {},
+                ['<C-l>'] = cmp.mapping(function()
+                    if luasnip.expand_or_locally_jumpable() then
+                        luasnip.expand_or_jump()
+                    end
+                end, { 'i', 's' }),
+                ['<C-h>'] = cmp.mapping(function()
+                    if luasnip.locally_jumpable(-1) then
+                        luasnip.jump(-1)
+                    end
+                end, { 'i', 's' }),
+            },
+            sources = {
+                { name = 'nvim_lsp' },
+                { name = 'luasnip' },
+                { name = 'path' },
+            },
+        }
+    end,
+},
+{
+    'folke/todo-comments.nvim',
+    event = 'VimEnter',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    opts = { signs = false }
+},
 
     'ThePrimeagen/harpoon',
     'eandrju/cellular-automaton.nvim',
     'ellisonleao/glow.nvim',
-    'nvim-neotest/neotest',
     'folke/todo-comments.nvim',
 
     {
@@ -351,55 +482,64 @@ require('lazy').setup({
     
 
     {
-        'nvim-treesitter/nvim-treesitter',
-        dependencies = {
-            {
-                'nvim-treesitter/playground',
-                cmd = 'TSPlaygroundToggle',
-            },
-            'lewis6991/spellsitter.nvim',
+    'nvim-treesitter/nvim-treesitter',
+    dependencies = {
+        {
+            'nvim-treesitter/playground',
+            cmd = 'TSPlaygroundToggle',
         },
-        config = function()
-            require('nvim-treesitter.configs').setup({
-                ensure_installed = {
-                    'python',
-                    'lua',
-                    'javascript',
-                    'markdown',
-                    'markdown_inline',
-                    'regex',
-                    'json',
-                    'yaml',
-                    'toml',
-                    'bash',
-                    'html',
-                    'css',
-                    'gitignore',
-                    'sql',
-                    'rust',
-                    'go',
-                    'graphql',
-                    'dockerfile',
-                    'vim',
-                    'vimdoc',
-                    'git_rebase',
-                },
-                sync_install = false,
-                highlight = {
-                    enable = true,
-                },
-                playground = {
-                    enable = true,
-                },
-                context_commentstring = {
-                    enable = true,
-                },
-                autotag = {
-                    enable = true,
-                },
-            })
-        end,
+        'lewis6991/spellsitter.nvim',
     },
+    config = function(_, opts)
+        require('nvim-treesitter.configs').setup({
+            ensure_installed = {
+                'python',
+                'lua',
+                'javascript',
+                'markdown',
+                'markdown_inline',
+                'regex',
+                'json',
+                'yaml',
+                'toml',
+                'bash',
+                'html',
+                'css',
+                'gitignore',
+                'sql',
+                'rust',
+                'go',
+                'graphql',
+                'dockerfile',
+                'vim',
+                'vimdoc',
+                'git_rebase',
+            },
+            sync_install = false,
+            highlight = {
+                enable = true,
+            },
+            playground = {
+                enable = true,
+            },
+            context_commentstring = {
+                enable = true,
+            },
+            autotag = {
+                enable = true,
+            },
+            additional_vim_regex_highlighting = { 'python' },
+            indent = { enable = true, disable = { 'python' } },
+        })
+
+        -- Ensure Treesitter installs via Git
+        require('nvim-treesitter.install').prefer_git = true
+        
+        -- Setup using opts argument
+        require('nvim-treesitter.configs').setup(opts)
+    end,
+},
+
 
     {
         'nvim-treesitter/nvim-treesitter-textobjects',
