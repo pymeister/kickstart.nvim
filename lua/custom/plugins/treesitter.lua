@@ -33,7 +33,10 @@ return {
         'git_rebase',
       },
       sync_install = false,
-      highlight = { enable = true },
+      highlight = {
+        enable = true,
+        additional_vim_regex_highlighting = false, -- Add this line
+      },
       playground = { enable = true },
       context_commentstring = { enable = true },
       autotag = { enable = true },

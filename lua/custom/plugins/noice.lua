@@ -12,6 +12,7 @@ return {
       },
       opts = { skip = true },
     })
+
     local focused = true
     vim.api.nvim_create_autocmd('FocusGained', {
       callback = function()
@@ -54,14 +55,29 @@ return {
     opts.presets = opts.presets or {}
     opts.presets.lsp_doc_border = true
 
+    -- Ensure nvim-notify is properly configured
+    if not opts.notify then
+      opts.notify = {}
+    end
+    opts.notify.setup = {
+      background_colour = '#000000', -- Set your preferred background color here
+    }
+
     return opts
   end,
   dependencies = {
-    -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+    -- If you lazy-load any plugin below, make sure to add proper `module="..."` entries
     'MunifTanjim/nui.nvim',
     -- OPTIONAL:
-    --   `nvim-notify` is only needed, if you want to use the notification view.
-    --   If not available, we use `mini` as the fallback
-    'rcarriga/nvim-notify',
+    -- `nvim-notify` is only needed if you want to use the notification view.
+    -- If not available, we use `mini` as the fallback
+    {
+      'rcarriga/nvim-notify',
+      config = function()
+        require('notify').setup {
+          background_colour = '#000000', -- Set your preferred background color here
+        }
+      end,
+    },
   },
 }

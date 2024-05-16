@@ -35,7 +35,6 @@ vim.api.nvim_create_autocmd('VimEnter', {
     vim.cmd [[hi StatusLineNC guibg=NONE]]
   end,
 })
-
 vim.opt.termguicolors = true
 vim.opt.number = true
 vim.opt.mouse = 'a'
@@ -83,18 +82,10 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require('lazy').setup({
-  -- Additional plugins from the kickstart repository
-  require 'kickstart.plugins.debug',
-  require 'kickstart.plugins.lint',
-  require 'kickstart.plugins.autopairs',
-  require 'kickstart.plugins.neo-tree',
-  require 'kickstart.plugins.gitsigns',
-  require 'kickstart.plugins.indent_line',
-  -- Custom plugin imports
-
-  { import = 'custom.plugins' },
-}, {
+require('lazy').setup {
+  spec = {
+    { import = 'custom.plugins' },
+  },
   ui = {
     icons = vim.g.have_nerd_font and {} or {
       cmd = '⌘',
@@ -112,7 +103,6 @@ require('lazy').setup({
       lazy = '💤 ',
     },
   },
-})
-
+}
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
