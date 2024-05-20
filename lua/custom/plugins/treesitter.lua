@@ -11,6 +11,7 @@ return {
     require('nvim-treesitter.configs').setup {
       ensure_installed = {
         'python',
+        'java',
         'lua',
         'javascript',
         'markdown',

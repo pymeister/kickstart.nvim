@@ -46,6 +46,7 @@ return {
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
     local servers = {
+      jdtls = {},
       pyright = {},
       black = {},
       debugpy = {},
@@ -66,6 +67,8 @@ return {
       'stylua',
     })
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+    require('java').setup()
+    require('lspconfig').jdtls.setup {}
     require('mason-lspconfig').setup {
       handlers = {
         function(server_name)

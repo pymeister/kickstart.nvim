@@ -56,11 +56,11 @@ return {
             action = 'Telescope find_files',
           },
           {
-            icon = ' ',
-            desc = 'Find Word          ',
-            key = 'w',
-            keymap = 'SPC f w',
-            action = 'Telescope live_grep',
+            icon = ' ',
+            desc = 'Neorg Index         ',
+            key = 'n',
+            keymap = 'SPC o i',
+            action = 'Neorg index',
           },
           {
             icon = ' ',
@@ -68,13 +68,6 @@ return {
             key = 'r',
             keymap = 'SPC f r',
             action = 'Telescope oldfiles',
-          },
-          {
-            icon = ' ',
-            desc = 'File Browser       ',
-            key = 'b',
-            keymap = 'SPC f b',
-            action = 'Telescope file_browser',
           },
           {
             icon = ' ',

@@ -24,6 +24,8 @@ vim.g.maplocalleader = ' '
 vim.g.python3_host_prog = '/opt/homebrew/bin/python3'
 vim.g.have_nerd_font = true
 vim.g.skip_ts_context_commentstring_module = true
+-- Enable modifiable for neorg index.norg
+vim.api.nvim_command 'autocmd FileType norg setlocal modifiable'
 vim.api.nvim_create_autocmd('VimEnter', {
   callback = function()
     vim.cmd [[hi Normal guibg=NONE ctermbg=NONE]]
@@ -54,6 +56,7 @@ vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 vim.opt.scrolloff = 10
+vim.api.nvim_set_keymap('n', '<Leader>oi', ':edit ~/neorg/index.norg<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
@@ -104,5 +107,6 @@ require('lazy').setup {
     },
   },
 }
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
