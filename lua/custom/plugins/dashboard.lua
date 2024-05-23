@@ -86,7 +86,7 @@ return {
         },
         footer = {
           '',
-          'Doom Emacs-style dashboard in Neovim',
+          'You are the Technology!',
           'Press <Space> followed by the shortcut key to perform an action',
         }, --your footer
       },

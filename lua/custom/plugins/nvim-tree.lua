@@ -4,6 +4,17 @@ return {
   config = function()
     local nvimtree = require 'nvim-tree'
     local api = require 'nvim-tree.api'
+    -- Enable termguicolors for true color support
+    vim.opt.termguicolors = true
+
+    -- Transparent background
+    vim.cmd [[
+      highlight Normal guibg=none
+      highlight NonText guibg=none
+      highlight LineNr guibg=none
+      highlight Folded guibg=none
+      highlight EndOfBuffer guibg=none
+    ]]
     -- recommended settings from nvim-tree documentation
     vim.g.loaded_netrw = 1
     vim.g.loaded_netrwPlugin = 1

@@ -15,7 +15,7 @@ return {
       workspaces = {
         {
           name = 'SchoolVault',
-          path = '~/kermitfrog19/SchoolVault',
+          path = '/Users/kermitfrog19/SchoolVault',
         },
       },
       -- Optional, if you keep notes in a specific subdirectory of your vault.
