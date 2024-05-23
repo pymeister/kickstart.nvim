@@ -27,6 +27,7 @@ return {
         },
       },
     }
+    vim.api.nvim_set_hl(0, 'TelescopeNormal', { bg = 'none' })
     pcall(require('telescope').load_extension, 'fzf')
     pcall(require('telescope').load_extension, 'ui-select')
     local builtin = require 'telescope.builtin'
