@@ -27,6 +27,9 @@ return {
         },
       },
     }
+    -- Enable termguicolors for true color support
+    vim.opt.termguicolors = true
+
     vim.api.nvim_set_hl(0, 'TelescopeNormal', { bg = 'none' })
     pcall(require('telescope').load_extension, 'fzf')
     pcall(require('telescope').load_extension, 'ui-select')
