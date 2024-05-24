@@ -18,7 +18,7 @@ return {
     'hrsh7th/cmp-path',
     'rafamadriz/friendly-snippets',
     'onsails/lspkind.nvim',
-    'micangl/cmp-vimtex', -- Add this line to include the cmp-vimtex plugina
+    'micangl/cmp-vimtex', -- Correctly added to include the cmp-vimtex plugin
     'hrsh7th/cmp-emoji',
   },
   config = function()
@@ -58,29 +58,29 @@ return {
           end
         end, { 'i', 's' }),
       },
-      sources = {
+      sources = cmp.config.sources {
         { name = 'nvim_lsp' },
         { name = 'luasnip' },
         { name = 'buffer' },
         { name = 'path' },
         { name = 'omni' },
         { name = 'emoji', insert = true },
-        { name = 'vimtex' }, -- Add this line to include the vimtex source
+        { name = 'vimtex' }, -- Correctly added to include the vimtex source
       },
       formatting = {
         format = lspkind.cmp_format {
+          mode = 'symbol_text',
           maxwidth = 50,
           ellipsis_char = '...',
-        },
-        menu = {
-          nvim_lsp = '[LSP]',
-          ultisnips = '[US]',
-          nvim_lua = '[Lua]',
-          path = '[Path]',
-          buffer = '[Buffer]',
-          emoji = '[Emoji]',
-          omni = '[Omni]',
-          vimtex = '[VimTeX]', -- Add this line to label the vimtex source
+          menu = {
+            nvim_lsp = '[LSP]',
+            luasnip = '[Snip]',
+            buffer = '[Buffer]',
+            path = '[Path]',
+            omni = '[Omni]',
+            emoji = '[Emoji]',
+            vimtex = '[VimTeX]', -- Label the vimtex source
+          },
         },
       },
     }
