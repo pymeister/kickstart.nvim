@@ -28,11 +28,12 @@ return {
       },
     }
     -- Enable termguicolors for true color support
-    vim.opt.termguicolors = true
-    vim.api.nvim_set_hl(0, 'TelescopeNormal', { bg = 'none' })
+
     pcall(require('telescope').load_extension, 'fzf')
     pcall(require('telescope').load_extension, 'ui-select')
     local builtin = require 'telescope.builtin'
+    vim.opt.termguicolors = true
+    vim.api.nvim_set_hl(0, 'TelescopeNormal', { bg = 'none' })
     vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
     vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
     vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
@@ -42,6 +43,7 @@ return {
     vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
     vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
     vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files' })
+
     vim.keymap.set('n', '<leader>fc', builtin.commands, { desc = '[F]ind [C]ommands' })
     vim.keymap.set('n', '<leader>fs', builtin.spell_suggest, { desc = '[F]ind [S]pelling Suggestion' })
   end,

@@ -25,6 +25,7 @@ vim.g.python3_host_prog = '/opt/homebrew/bin/python3'
 vim.g.have_nerd_font = true
 vim.g.skip_ts_context_commentstring_module = true
 -- Enable modifiable for neorg index.norg
+vim.api.nvim_set_hl(0, 'TelescopeNormal', { bg = 'none' })
 vim.api.nvim_command 'autocmd FileType norg setlocal modifiable'
 vim.api.nvim_create_autocmd('VimEnter', {
   callback = function()
